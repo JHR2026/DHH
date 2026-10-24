@@ -127,7 +127,7 @@ export function analyze(data, today, holidaysFor) {
 
   // Familienheimfahrt: eine je Woche (gezählt wird die Fahrt zur Wohnung; Rückfahrt ist enthalten)
   const fhfWeeks = new Map();
-  let lastHin = null;
+  let lastHin = null, lastHinItem = null;
   for (const it of items) {
     if (it.cls === 'fhf_hin') {
       const wk = isoWeekKey(it.date);
@@ -142,10 +142,11 @@ export function analyze(data, today, holidaysFor) {
         it.note = 'Mehr als eine Familienheimfahrt in dieser Woche – nicht ansetzbar (ggf. Wahlrecht nutzen).';
         warn(it.date, it.note, it.leg.id);
       }
-      lastHin = it.date;
+      lastHin = it.date; lastHinItem = it;
     } else if (it.cls === 'fhf_rueck') {
       it.km = km.ho;
       it.note = 'Rückfahrt – in der Familienheimfahrt enthalten.';
+      if (lastHinItem && !lastHinItem.rueckDate && diffDays(lastHin, it.date) <= 14) { lastHinItem.rueckDate = it.date; it.hinDate = lastHin; it.note = `Rückfahrt zur Familienheimfahrt vom ${lastHin.split('-').reverse().join('.')} – im Betrag enthalten.`; }
       if (!lastHin || diffDays(lastHin, it.date) > 14) {
         it.note = 'Rückfahrt ohne erfasste Heimfahrt davor.';
         warn(it.date, 'Rückfahrt zum Beschäftigungsort, aber keine Heimfahrt davor erfasst.', it.leg.id);
@@ -180,8 +181,10 @@ export function analyze(data, today, holidaysFor) {
     if (p.start > last) { windows.push({ period: p, start: null, end: null }); continue; }
     const firstLeg = legs.find((l) => l.date >= p.start && (!p.end || l.date <= p.end));
     let loc = firstLeg ? firstLeg.from : 'home';
-    let wStart = null, wEnd = null, homeStreak = 0;
+    let wStart = p.start, wEnd = addDays(addMonths(p.start, DHH_VERPFLEGUNG_MONATE), -1), homeStreak = 0;
     for (const d of rangeDates(p.start, last)) {
+      // Tage vor der ersten erfassten Fahrt: nicht erfasst, weder Verpflegung noch „Zuhause“-Serie
+      if (!firstLeg || d < firstLeg.date) continue;
       const startLoc = loc;
       let touchedHome = false;
       for (const l of legsByDate.get(d) || []) {
@@ -195,7 +198,7 @@ export function analyze(data, today, holidaysFor) {
       if (!(sh && eh)) base = (sh || eh) ? rate.kurz : (touchedHome ? rate.kurz : rate.voll);
       if (sh && eh) { homeStreak++; }
       else {
-        if (wStart === null || homeStreak >= DHH_UNTERBRECHUNG_TAGE) {
+        if (homeStreak >= DHH_UNTERBRECHUNG_TAGE) {
           wStart = d; wEnd = addDays(addMonths(d, DHH_VERPFLEGUNG_MONATE), -1);
         }
         homeStreak = 0;

@@ -8,7 +8,7 @@ import { modal, confirmDialog, field, select, numInput, textInput, dateInput, ch
 import { rateFor } from './rates.js';
 import { VERPFLEGUNG } from './rates.js';
 
-const QUICK = [['home', 'office'], ['office', 'home'], ['office', 'zweit'], ['zweit', 'office'], ['home', 'zweit'], ['zweit', 'home']];
+const QUICK = [['home', 'office'], ['office', 'home'], ['zweit', 'office'], ['office', 'zweit'], ['home', 'zweit'], ['zweit', 'home']];
 
 function kmFor(a, b) {
   const s = S.data.settings, set = new Set([a, b]);

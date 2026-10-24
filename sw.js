@@ -1,6 +1,6 @@
 // Service Worker: legt die App-Dateien auf dem Gerät ab, damit sie offline funktioniert.
 // Bei einer neuen App-Version VERSION erhöhen – dann wird der Zwischenspeicher erneuert.
-const VERSION = 'fahrtenbuch-v1.0.0';
+const VERSION = 'fahrtenbuch-v1.0.1';
 const FILES = [
   './', './index.html', './app.css', './manifest.webmanifest',
   './js/app.js', './js/util.js', './js/rates.js', './js/holidays.js', './js/calc.js', './js/db.js', './js/store.js',

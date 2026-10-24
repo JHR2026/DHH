@@ -7,7 +7,7 @@ import { RATES_STAND, ENTFERNUNG, KM_DIENSTREISE, VERPFLEGUNG, rateFor } from '.
 import { buildFullBackup, markFullBackupDone, readBackupFile, planMerge, applyMerge, describe, buildIcs, deliverMany } from './backup.js';
 import { field, select, textInput, numInput, dateInput, checkbox, modal, confirmDialog, infoDialog, busy, toast, nav } from './ui.js';
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.0.1';
 
 // Eingabefeld, das beim Verlassen/Ändern sofort in die Einstellungen schreibt
 function saved(input, key, parse = (v) => v) {

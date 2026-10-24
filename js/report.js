@@ -60,7 +60,7 @@ export function buildModel(range) {
   }));
 
   const fhf = sum.items.filter((i) => i.cls === 'fhf_hin').map((i) => ({
-    week: i.week, date: i.date, km: i.km, amount: i.amount, note: i.amount > 0 ? '' : i.note,
+    week: i.week, date: i.date, rueck: i.rueckDate || '', km: i.km, amount: i.amount, note: i.amount > 0 ? '' : i.note,
   }));
 
   const vz = sum.dhhRows.map((d) => ({
@@ -166,9 +166,9 @@ export async function buildXlsx(m) {
   for (const f of m.fahrten) s2.push([{ v: f.date, t: 'date' }, fmtDay(f.date).split(',')[0], f.strecke, f.mode, { v: f.km, t: 'num' }, f.cls, { v: f.amount, t: 'eur' }, f.note]);
   sheets.push(['Fahrten', s2, [12, 11, 30, 18, 8, 42, 14, 50]]);
 
-  const s3 = [H('Kalenderwoche', 'Datum Heimfahrt', 'Einfache Entfernung km', 'Betrag', 'Hinweis')];
-  for (const f of m.fhf) s3.push([f.week, { v: f.date, t: 'date' }, { v: f.km, t: 'num' }, { v: f.amount, t: 'eur' }, f.note]);
-  sheets.push(['Familienheimfahrten', s3, [16, 16, 22, 14, 60]]);
+  const s3 = [H('Kalenderwoche', 'Datum Heimfahrt', 'Datum Rückfahrt', 'Einfache Entfernung km', 'Betrag', 'Hinweis')];
+  for (const f of m.fhf) s3.push([f.week, { v: f.date, t: 'date' }, f.rueck ? { v: f.rueck, t: 'date' } : '', { v: f.km, t: 'num' }, { v: f.amount, t: 'eur' }, f.note]);
+  sheets.push(['Familienheimfahrten', s3, [16, 16, 16, 22, 14, 60]]);
 
   const s4 = [H('Datum', 'Abwesenheit', 'Pauschale', 'Kürzung Mahlzeiten', 'Angesetzt', 'Hinweis')];
   for (const v of m.vz) s4.push([{ v: v.date, t: 'date' }, v.abw, { v: v.base, t: 'eur' }, { v: v.cut, t: 'eur' }, { v: v.amount, t: 'eur' }, v.note]);
@@ -349,8 +349,8 @@ export async function buildPdf(m, opts = {}) {
 
   if (m.fhf.length) {
     h1('Familienheimfahrten je Kalenderwoche');
-    table([{ k: 'w', t: 'Kalenderwoche', w: 2 }, { k: 'd', t: 'Heimfahrt am', w: 2 }, { k: 'km', t: 'Entfernung (einfach)', w: 2, a: 'r' }, { k: 'a', t: 'Betrag', w: 2, a: 'r' }, { k: 'n', t: 'Hinweis', w: 4 }],
-      m.fhf.map((f) => ({ w: f.week, d: fmtDay(f.date), km: fmtNum(f.km) + ' km', a: euro(f.amount), n: f.note })));
+    table([{ k: 'w', t: 'Kalenderwoche', w: 2 }, { k: 'd', t: 'Heimfahrt am', w: 2 }, { k: 'r', t: 'Rückfahrt am', w: 2 }, { k: 'km', t: 'Entfernung (einfach)', w: 2, a: 'r' }, { k: 'a', t: 'Betrag', w: 2, a: 'r' }, { k: 'n', t: 'Hinweis', w: 4 }],
+      m.fhf.map((f) => ({ w: f.week, d: fmtDay(f.date), r: f.rueck ? fmtDay(f.rueck) : '-', km: fmtNum(f.km) + ' km', a: euro(f.amount), n: f.note })));
   }
 
   if (m.vz.length) {

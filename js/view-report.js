@@ -68,8 +68,8 @@ export function renderReport(root) {
   root.append(det(`Fahrten (${m.fahrten.length})`, m.fahrten.length ? fahrtTbl : h('div', { class: 'empty' }, 'Keine Fahrten im Zeitraum.')));
 
   if (m.fhf.length) root.append(det(`Familienheimfahrten (${m.fhf.length})`, h('table', { class: 'tbl' },
-    h('thead', null, h('tr', null, h('th', null, 'KW'), h('th', null, 'Datum'), h('th', { class: 'r' }, 'km'), h('th', { class: 'r' }, 'Betrag'))),
-    h('tbody', null, m.fhf.map((f) => h('tr', null, h('td', null, f.week), h('td', null, fmtDay(f.date), f.note ? h('div', { class: 'small muted' }, f.note) : null), h('td', { class: 'r' }, fmtNum(f.km)), h('td', { class: 'r' }, euro(f.amount))))))));
+    h('thead', null, h('tr', null, h('th', null, 'KW'), h('th', null, 'Heimfahrt / Rückfahrt'), h('th', { class: 'r' }, 'km'), h('th', { class: 'r' }, 'Betrag'))),
+    h('tbody', null, m.fhf.map((f) => h('tr', null, h('td', null, f.week), h('td', null, fmtDay(f.date), f.rueck ? ' / ' + fmtDay(f.rueck) : '', f.note ? h('div', { class: 'small muted' }, f.note) : null), h('td', { class: 'r' }, fmtNum(f.km)), h('td', { class: 'r' }, euro(f.amount))))))));
 
   if (m.vz.length || m.periods.length) {
     const info = m.periods.map((p) => h('p', { class: 'small' }, `dHH ${fmtDate(p.start)} – ${p.end ? fmtDate(p.end) : 'laufend'}`, p.vzStart ? ` · Verpflegung bis ${fmtDate(p.vzEnd)}` : ''));
